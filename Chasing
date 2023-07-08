@@ -1,39 +1,58 @@
 import tkinter as tk
+from tkinter import messagebox
 import pandas as pd
+import win32com.client as win32
 
-def chase_counterparties():
-    file_path = entry_file_path.get()
+def filter_data():
+    criteria = entry_criteria.get()
+
+    # Validate inputs
+    if not criteria:
+        messagebox.showerror("Error", "Please enter a filtering criteria.")
+        return
+    
     try:
-        df = pd.read_excel(file_path)  # Read the Excel file
-        filtered_df = df[df['Outstanding Payments'] > 0]  # Filter rows with outstanding payments
-        counterparties = filtered_df['Counterparty'].tolist()  # Assuming 'Counterparty' is the column header
-        counterparties_text = '\n'.join(counterparties)  # Convert the list of counterparties to a single string
-        text_output.delete('1.0', tk.END)  # Clear the text output
-        text_output.insert(tk.END, counterparties_text)  # Display the counterparties in the text box
-    except FileNotFoundError:
-        text_output.delete('1.0', tk.END)  # Clear the text output
-        text_output.insert(tk.END, "File not found!")
+        df_filtered = df[df['Criteria Column'].str.contains(criteria, case=False)]  # Assuming 'Criteria Column' is the column header
+        generate_emails(df_filtered)
     except Exception as e:
-        text_output.delete('1.0', tk.END)  # Clear the text output
-        text_output.insert(tk.END, f"An error occurred: {str(e)}")
+        messagebox.showerror("Error", f"An error occurred while filtering data: {str(e)}")
+
+def generate_emails(filtered_df):
+    outlook = win32.Dispatch('Outlook.Application')
+
+    for index, row in filtered_df.iterrows():
+        recipient = row['Email']  # Assuming 'Email' is the column header
+        subject = 'Your Subject'
+        body = 'Your email body'
+
+        mail = outlook.CreateItem(0)
+        mail.Subject = subject
+        mail.Body = body
+        mail.To = recipient
+        mail.Save()
+
+    messagebox.showinfo("Success", "Draft emails created and saved in Outlook.")
 
 # Create the main window
 window = tk.Tk()
-window.title("Counterparty Chaser")
+window.title("Filter Data and Create Draft Emails")
 
-# Create file path entry
-label_file_path = tk.Label(window, text="File Path:")
-label_file_path.pack()
-entry_file_path = tk.Entry(window)
-entry_file_path.pack()
+# Create criteria entry
+label_criteria = tk.Label(window, text="Filtering Criteria:")
+label_criteria.pack()
+entry_criteria = tk.Entry(window)
+entry_criteria.pack()
 
-# Create chase button
-button_chase = tk.Button(window, text="Chase Counterparties", command=chase_counterparties)
-button_chase.pack()
+# Create filter button
+button_filter = tk.Button(window, text="Filter Data", command=filter_data)
+button_filter.pack()
 
-# Create text output area
-text_output = tk.Text(window)
-text_output.pack()
+# Read the data from an Excel file
+try:
+    df = pd.read_excel('data.xlsx')  # Replace 'data.xlsx' with your file path
+except FileNotFoundError:
+    messagebox.showerror("Error", "Data file not found.")
+    exit()
 
 # Start the main loop
 window.mainloop()
