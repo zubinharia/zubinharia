@@ -1,0 +1,39 @@
+import tkinter as tk
+import pandas as pd
+
+def chase_counterparties():
+    file_path = entry_file_path.get()
+    try:
+        df = pd.read_excel(file_path)  # Read the Excel file
+        filtered_df = df[df['Outstanding Payments'] > 0]  # Filter rows with outstanding payments
+        counterparties = filtered_df['Counterparty'].tolist()  # Assuming 'Counterparty' is the column header
+        counterparties_text = '\n'.join(counterparties)  # Convert the list of counterparties to a single string
+        text_output.delete('1.0', tk.END)  # Clear the text output
+        text_output.insert(tk.END, counterparties_text)  # Display the counterparties in the text box
+    except FileNotFoundError:
+        text_output.delete('1.0', tk.END)  # Clear the text output
+        text_output.insert(tk.END, "File not found!")
+    except Exception as e:
+        text_output.delete('1.0', tk.END)  # Clear the text output
+        text_output.insert(tk.END, f"An error occurred: {str(e)}")
+
+# Create the main window
+window = tk.Tk()
+window.title("Counterparty Chaser")
+
+# Create file path entry
+label_file_path = tk.Label(window, text="File Path:")
+label_file_path.pack()
+entry_file_path = tk.Entry(window)
+entry_file_path.pack()
+
+# Create chase button
+button_chase = tk.Button(window, text="Chase Counterparties", command=chase_counterparties)
+button_chase.pack()
+
+# Create text output area
+text_output = tk.Text(window)
+text_output.pack()
+
+# Start the main loop
+window.mainloop()
