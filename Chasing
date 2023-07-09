@@ -1,58 +1,49 @@
 import tkinter as tk
-from tkinter import messagebox
-import pandas as pd
-import win32com.client as win32
+from tkinter import ttk
 
-def filter_data():
-    criteria = entry_criteria.get()
+def populate_table():
+    # Clear existing rows
+    table.delete(*table.get_children())
 
-    # Validate inputs
-    if not criteria:
-        messagebox.showerror("Error", "Please enter a filtering criteria.")
-        return
-    
-    try:
-        df_filtered = df[df['Criteria Column'].str.contains(criteria, case=False)]  # Assuming 'Criteria Column' is the column header
-        generate_emails(df_filtered)
-    except Exception as e:
-        messagebox.showerror("Error", f"An error occurred while filtering data: {str(e)}")
+    # Get data from a data source (e.g., a list or a pandas DataFrame)
+    data = [
+        ["John", "Doe", 25],
+        ["Jane", "Smith", 30],
+        ["Alex", "Johnson", 35]
+    ]
 
-def generate_emails(filtered_df):
-    outlook = win32.Dispatch('Outlook.Application')
-
-    for index, row in filtered_df.iterrows():
-        recipient = row['Email']  # Assuming 'Email' is the column header
-        subject = 'Your Subject'
-        body = 'Your email body'
-
-        mail = outlook.CreateItem(0)
-        mail.Subject = subject
-        mail.Body = body
-        mail.To = recipient
-        mail.Save()
-
-    messagebox.showinfo("Success", "Draft emails created and saved in Outlook.")
+    # Populate the table with data
+    for row in data:
+        table.insert("", "end", values=row)
 
 # Create the main window
 window = tk.Tk()
-window.title("Filter Data and Create Draft Emails")
+window.title("Data Table")
 
-# Create criteria entry
-label_criteria = tk.Label(window, text="Filtering Criteria:")
-label_criteria.pack()
-entry_criteria = tk.Entry(window)
-entry_criteria.pack()
+# Create the Treeview widget
+table = ttk.Treeview(window, columns=("First Name", "Last Name", "Age"), show="headings")
 
-# Create filter button
-button_filter = tk.Button(window, text="Filter Data", command=filter_data)
-button_filter.pack()
+# Define column headers
+table.heading("First Name", text="First Name")
+table.heading("Last Name", text="Last Name")
+table.heading("Age", text="Age")
 
-# Read the data from an Excel file
-try:
-    df = pd.read_excel('data.xlsx')  # Replace 'data.xlsx' with your file path
-except FileNotFoundError:
-    messagebox.showerror("Error", "Data file not found.")
-    exit()
+# Define column widths
+table.column("First Name", width=100)
+table.column("Last Name", width=100)
+table.column("Age", width=50)
+
+# Add a vertical scrollbar
+scrollbar = ttk.Scrollbar(window, orient="vertical", command=table.yview)
+table.configure(yscroll=scrollbar.set)
+scrollbar.pack(side="right", fill="y")
+
+# Add the table to the window
+table.pack()
+
+# Create a button to populate the table
+button_populate = tk.Button(window, text="Populate Table", command=populate_table)
+button_populate.pack()
 
 # Start the main loop
 window.mainloop()
