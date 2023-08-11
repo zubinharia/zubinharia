@@ -1,0 +1,51 @@
+import tkinter as tk
+from datetime import datetime
+
+def login():
+    username = entry_username.get()
+    password = entry_password.get()
+
+    # Check credentials (replace this with your own authentication logic)
+    if username == "admin" and password == "password":
+        log_login_attempt(username, success=True)
+        launch_application()
+    else:
+        log_login_attempt(username, success=False)
+        label_status.config(text="Invalid username or password", fg="red")
+
+def launch_application():
+    # Replace this with code to launch your application
+    pass
+
+def log_login_attempt(username, success):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    status = "Success" if success else "Failure"
+    log_message = f"{timestamp} - User: {username} - Status: {status}\n"
+
+    with open("login_log.txt", "a") as log_file:
+        log_file.write(log_message)
+
+# Create the main window
+root = tk.Tk()
+root.title("Login Screen")
+
+# Create labels and entry fields for username and password
+label_username = tk.Label(root, text="Username:")
+label_password = tk.Label(root, text="Password:")
+entry_username = tk.Entry(root)
+entry_password = tk.Entry(root, show="*")
+label_status = tk.Label(root, text="", fg="red")
+
+# Create login button
+button_login = tk.Button(root, text="Login", command=login)
+
+# Organize widgets using grid layout
+label_username.grid(row=0, column=0, padx=10, pady=5)
+entry_username.grid(row=0, column=1, padx=10, pady=5)
+label_password.grid(row=1, column=0, padx=10, pady=5)
+entry_password.grid(row=1, column=1, padx=10, pady=5)
+button_login.grid(row=2, column=1, padx=10, pady=10)
+label_status.grid(row=3, columnspan=2)
+
+# Start the main loop
+root.mainloop()
