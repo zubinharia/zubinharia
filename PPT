@@ -1,0 +1,40 @@
+from pptx import Presentation
+from pptx.util import Inches
+
+# Create a presentation object
+prs = Presentation()
+
+# Slide 1: Title Slide
+slide_1 = prs.slides.add_slide(prs.slide_layouts[0])  # Title Slide Layout
+title = slide_1.shapes.title
+subtitle = slide_1.placeholders[1]
+
+title.text = "Operations Utility Model with Tkinter in Python"
+subtitle.text = "Streamlining Operations with a Custom Tkinter Application\nYour Name\nDate"
+
+# Slide 2: Introduction
+slide_2 = prs.slides.add_slide(prs.slide_layouts[1])  # Title and Content Layout
+title = slide_2.shapes.title
+content = slide_2.placeholders[1]
+
+title.text = "Introduction"
+content.text = (
+    "Briefly introduce the topic and its significance.\n"
+    "Mention the goal of your presentation.\n"
+    "State the problem your model addresses."
+)
+
+# Slide 3: Features and UI
+slide_3 = prs.slides.add_slide(prs.slide_layouts[1])  # Title and Content Layout
+title = slide_3.shapes.title
+content = slide_3.placeholders[1]
+
+title.text = "Features and UI"
+content.text = (
+    "List key features and capabilities of your utility model.\n"
+    "Showcase a screenshot of the Tkinter application's UI.\n"
+    "Highlight the user-friendly design."
+)
+
+# Save the presentation
+prs.save("Operations_Utility_Model_Presentation.pptx")
